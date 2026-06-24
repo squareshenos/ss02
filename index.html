@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SS02 - Welcome</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            font-family: 'Georgia', 'Times New Roman', serif;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .container {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: fadeInUp 1.2s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 300;
+            color: #ffffff;
+            letter-spacing: 0.08em;
+            text-transform: lowercase;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 2px;
+            animation: lineGrow 1.5s ease-out 0.5s both;
+        }
+
+        @keyframes lineGrow {
+            from {
+                width: 0;
+                opacity: 0;
+            }
+            to {
+                width: 60px;
+                opacity: 1;
+            }
+        }
+
+        .subtitle {
+            margin-top: 2.5rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-family: 'Courier New', monospace;
+            animation: fadeIn 1.5s ease-out 1s both;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            margin: 0 12px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>welcome to ss02</h1>
+        <div class="subtitle">
+            <span class="dot"></span>
+            github.com/squareshenos/ss02
+            <span class="dot"></span>
+        </div>
+    </div>
+</body>
+</html>
