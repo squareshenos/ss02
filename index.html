@@ -1,140 +1,309 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SS02 - Welcome</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            font-family: 'Georgia', 'Times New Roman', serif;
-        }
-
-        @keyframes gradientShift {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        .container {
-            text-align: center;
-            padding: 3rem;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            animation: fadeInUp 1.2s ease-out;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        h1 {
-            font-size: clamp(2.5rem, 8vw, 5rem);
-            font-weight: 300;
-            color: #ffffff;
-            letter-spacing: 0.08em;
-            text-transform: lowercase;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            position: relative;
-            display: inline-block;
-        }
-
-        h1::after {
-            content: '';
-            position: absolute;
-            bottom: -16px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 2px;
-            animation: lineGrow 1.5s ease-out 0.5s both;
-        }
-
-        @keyframes lineGrow {
-            from {
-                width: 0;
-                opacity: 0;
-            }
-            to {
-                width: 60px;
-                opacity: 1;
-            }
-        }
-
-        .subtitle {
-            margin-top: 2.5rem;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            font-family: 'Courier New', monospace;
-            animation: fadeIn 1.5s ease-out 1s both;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .dot {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            margin: 0 12px;
-            vertical-align: middle;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome to SS02</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    overflow: hidden;
+    background: #000;
+    cursor: crosshair;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+  }
+  canvas { display: block; }
+  .title {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    pointer-events: none;
+  }
+  .title h1 {
+    font-size: clamp(2rem, 6vw, 5rem);
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.9);
+    text-shadow:
+      0 0 20px rgba(140,180,255,0.6),
+      0 0 60px rgba(100,160,255,0.3),
+      0 0 100px rgba(80,140,255,0.2);
+    animation: glow 3s ease-in-out infinite alternate;
+    white-space: nowrap;
+  }
+  @keyframes glow {
+    0% { text-shadow: 0 0 20px rgba(140,180,255,0.6), 0 0 60px rgba(100,160,255,0.3), 0 0 100px rgba(80,140,255,0.2); }
+    100% { text-shadow: 0 0 30px rgba(160,200,255,0.8), 0 0 80px rgba(120,180,255,0.5), 0 0 140px rgba(100,160,255,0.3); }
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>welcome to ss02</h1>
-        <div class="subtitle">
-            <span class="dot"></span>
-            github.com/squareshenos/ss02
-            <span class="dot"></span>
-        </div>
-    </div>
+<div class="title"><h1>Welcome to SS02!</h1></div>
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let W, H;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ---- Starfield ----
+const STAR_COUNT = 800;
+const stars = [];
+const centerX = () => W / 2;
+const centerY = () => H / 2;
+
+class Star {
+  constructor() {
+    this.reset(true);
+  }
+  reset(initial) {
+    const angle = Math.random() * Math.PI * 2;
+    const dist = initial ? Math.random() * Math.max(W, H) * 0.7 : Math.max(W, H) * 0.7;
+    this.x = centerX() + Math.cos(angle) * dist;
+    this.y = centerY() + Math.sin(angle) * dist * 0.55;
+    this.z = Math.random() * 3;
+    this.size = 0.5 + Math.random() * 1.8;
+    this.brightness = 0.4 + Math.random() * 0.6;
+    this.twinkleSpeed = 0.005 + Math.random() * 0.02;
+    this.twinkleOffset = Math.random() * Math.PI * 2;
+    // color tint: blueish to white to slight purple
+    const t = Math.random();
+    if (t < 0.6) {
+      this.r = 180 + Math.random() * 75;
+      this.g = 190 + Math.random() * 65;
+      this.b = 240 + Math.random() * 15;
+    } else if (t < 0.85) {
+      this.r = 230 + Math.random() * 25;
+      this.g = 220 + Math.random() * 35;
+      this.b = 200 + Math.random() * 55;
+    } else {
+      this.r = 255;
+      this.g = 220 + Math.random() * 35;
+      this.b = 180 + Math.random() * 40;
+    }
+    this.orbitSpeed = (0.00005 + Math.random() * 0.0003) * (Math.random() > 0.5 ? 1 : -1);
+    this.orbitAngle = angle;
+    this.orbitDist = dist;
+  }
+  update(time) {
+    this.orbitAngle += this.orbitSpeed;
+    const cx = centerX();
+    const cy = centerY();
+    this.x = cx + Math.cos(this.orbitAngle) * this.orbitDist;
+    this.y = cy + Math.sin(this.orbitAngle) * this.orbitDist * 0.55;
+    this.twinkle = 0.5 + 0.5 * Math.sin(time * this.twinkleSpeed + this.twinkleOffset);
+    // recycle if too close to center
+    const dx = this.x - cx;
+    const dy = this.y - cy;
+    if (Math.sqrt(dx*dx + dy*dy) < 30) {
+      this.reset(false);
+    }
+  }
+  draw() {
+    const alpha = this.brightness * (0.6 + 0.4 * this.twinkle);
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${this.r},${this.g},${this.b},${alpha})`;
+    ctx.fill();
+    if (this.size > 1.2) {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size * 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${this.r},${this.g},${this.b},${alpha * 0.15})`;
+      ctx.fill();
+    }
+  }
+}
+
+for (let i = 0; i < STAR_COUNT; i++) {
+  stars.push(new Star());
+}
+
+// ---- Nebula particles ----
+const nebulaParticles = [];
+const NEBULA_COUNT = 120;
+class NebulaParticle {
+  constructor() {
+    this.reset();
+  }
+  reset() {
+    const cx = centerX();
+    const cy = centerY();
+    this.x = cx + (Math.random() - 0.5) * W * 0.6;
+    this.y = cy + (Math.random() - 0.5) * H * 0.6;
+    this.size = 40 + Math.random() * 120;
+    this.alpha = 0.01 + Math.random() * 0.04;
+    this.speedX = (Math.random() - 0.5) * 0.15;
+    this.speedY = (Math.random() - 0.5) * 0.1;
+    this.hue = [210, 240, 260, 280, 30, 45][Math.floor(Math.random() * 6)];
+  }
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    const cx = centerX(), cy = centerY();
+    if (Math.abs(this.x - cx) > W * 0.4 || Math.abs(this.y - cy) > H * 0.4) {
+      this.reset();
+    }
+  }
+  draw() {
+    const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+    grad.addColorStop(0, `hsla(${this.hue},60%,60%,${this.alpha * 1.5})`);
+    grad.addColorStop(0.5, `hsla(${this.hue},50%,40%,${this.alpha * 0.6})`);
+    grad.addColorStop(1, 'transparent');
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+}
+for (let i = 0; i < NEBULA_COUNT; i++) nebulaParticles.push(new NebulaParticle());
+
+// ---- Shooting stars ----
+const shootingStars = [];
+function spawnShootingStar() {
+  if (shootingStars.length < 3 && Math.random() < 0.008) {
+    const startX = Math.random() * W * 0.8;
+    const startY = Math.random() * H * 0.5;
+    shootingStars.push({
+      x: startX, y: startY,
+      vx: 4 + Math.random() * 6,
+      vy: 1 + Math.random() * 3,
+      life: 1,
+      decay: 0.008 + Math.random() * 0.025,
+      len: 60 + Math.random() * 100
+    });
+  }
+}
+
+// ---- Ripple system ----
+const ripples = [];
+const MAX_RIPPLES = 30;
+
+class Ripple {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.radius = 0;
+    this.maxRadius = 80 + Math.random() * 120;
+    this.strength = 0.5 + Math.random() * 0.5;
+    this.speed = 1.2 + Math.random() * 1.5;
+    this.alive = true;
+  }
+  update() {
+    this.radius += this.speed;
+    if (this.radius >= this.maxRadius) {
+      this.alive = false;
+    }
+  }
+  draw() {
+    const progress = this.radius / this.maxRadius;
+    const alpha = this.strength * (1 - progress) * (1 - progress);
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(160,200,255,${alpha})`;
+    ctx.lineWidth = 2 * (1 - progress);
+    ctx.stroke();
+    // inner glow ring
+    if (progress < 0.5) {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius * 0.6, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(200,230,255,${alpha * 1.5})`;
+      ctx.lineWidth = 3 * (1 - progress * 2);
+      ctx.stroke();
+    }
+  }
+}
+
+let mouseX = -100, mouseY = -100, mouseActive = false;
+canvas.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  mouseActive = true;
+  if (ripples.length < MAX_RIPPLES) {
+    ripples.push(new Ripple(mouseX, mouseY));
+  }
+});
+canvas.addEventListener('mouseleave', () => { mouseActive = false; });
+
+// ---- Main loop ----
+let time = 0;
+function animate() {
+  time++;
+  ctx.fillStyle = 'rgba(2, 3, 15, 0.25)';
+  ctx.fillRect(0, 0, W, H);
+
+  // Nebula backdrop
+  nebulaParticles.forEach(p => { p.update(); p.draw(); });
+
+  // Stars
+  stars.forEach(s => { s.update(time); s.draw(); });
+
+  // Shooting stars
+  spawnShootingStar();
+  for (let i = shootingStars.length - 1; i >= 0; i--) {
+    const ss = shootingStars[i];
+    ss.life -= ss.decay;
+    if (ss.life <= 0) { shootingStars.splice(i,1); continue; }
+    const grad = ctx.createLinearGradient(ss.x, ss.y, ss.x - ss.vx * ss.len, ss.y - ss.vy * ss.len);
+    grad.addColorStop(0, `rgba(255,255,255,${ss.life})`);
+    grad.addColorStop(1, 'transparent');
+    ctx.beginPath();
+    ctx.moveTo(ss.x, ss.y);
+    ctx.lineTo(ss.x - ss.vx * ss.len, ss.y - ss.vy * ss.len);
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ss.x += ss.vx;
+    ss.y += ss.vy;
+  }
+
+  // Ripples
+  for (let i = ripples.length - 1; i >= 0; i--) {
+    ripples[i].update();
+    ripples[i].draw();
+    if (!ripples[i].alive) ripples.splice(i, 1);
+  }
+
+  // Central galaxy core glow
+  const cx = centerX(), cy = centerY();
+  const coreGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(W, H) * 0.35);
+  coreGrad.addColorStop(0, 'rgba(60,80,140,0.06)');
+  coreGrad.addColorStop(0.5, 'rgba(30,50,100,0.03)');
+  coreGrad.addColorStop(1, 'transparent');
+  ctx.fillStyle = coreGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Mouse glow
+  if (mouseActive) {
+    const mgrad = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 60);
+    mgrad.addColorStop(0, 'rgba(180,210,255,0.08)');
+    mgrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = mgrad;
+    ctx.beginPath();
+    ctx.arc(mouseX, mouseY, 60, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+
+// Handle resize properly
+window.addEventListener('resize', () => {
+  resize();
+  // reposition nebula particles
+  nebulaParticles.forEach(p => p.reset());
+});
+</script>
 </body>
 </html>
